@@ -119,7 +119,7 @@
             border-color: var(--accent-color);
         }
 
-        /* النتيجة والافضلية */
+        /* النتيجة */
         .result-box {
             margin-top: 25px;
             padding: 15px;
@@ -206,4 +206,100 @@
     <div id="voice-team" class="tab-content">
         <h2>نظام تيم الفويس</h2>
         <div class="input-group">
-            <label>خبرة الفويس (Voice XP
+            <label>خبرة الفويس (Voice XP)</label>
+            <input type="number" id="v-xp" value="0" min="0" oninput="calcVoice()">
+        </div>
+        <div class="input-group">
+            <label>تحذيرات الفويس (Voice Warns)</label>
+            <input type="number" id="v-warns" value="0" min="0" oninput="calcVoice()">
+        </div>
+        <div class="input-group">
+            <label>ايفنت في الشات (Chat Event)</label>
+            <input type="number" id="v-events" value="0" min="0" oninput="calcVoice()">
+        </div>
+        <div class="input-group">
+            <label>ايفنت الستيج (Stage Event)</label>
+            <input type="number" id="v-stage" value="0" min="0" oninput="calcVoice()">
+        </div>
+        <div class="result-box">
+            <span>مجموع النقاط الحالي</span>
+            <div class="points" id="voice-points">0</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // وظيفة التنقل بين التبويبات
+    function openTeam(evt, teamId) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+            tabcontent[i].classList.remove("active");
+        }
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+        document.getElementById(teamId).style.display = "block";
+        document.getElementById(teamId).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+
+    // تنسيق الأرقام لظهور رقمين بعد الفاصلة وحذف الأصفار الزائدة
+    function formatPoints(num) {
+        return Number(num.toFixed(2)).toString();
+    }
+
+    // حساب نقاط Ticket Team
+    function calcTicket() {
+        var totalTickets = parseFloat(document.getElementById('t-tickets').value) || 0;
+        var scamTickets = parseFloat(document.getElementById('t-scam').value) || 0;
+        var xp = parseFloat(document.getElementById('t-xp').value) || 0;
+        var bans = parseFloat(document.getElementById('t-bans').value) || 0;
+
+        var regularTickets = totalTickets - scamTickets;
+        if (regularTickets < 0) regularTickets = 0;
+
+        var pointsFromTickets = regularTickets / 4;
+        var pointsFromScam = scamTickets / 2;
+        var pointsFromXp = xp / 1500;
+        var pointsFromBans = bans / 5;
+
+        var totalPoints = pointsFromTickets + pointsFromScam + pointsFromXp + pointsFromBans;
+        document.getElementById('ticket-points').innerText = formatPoints(totalPoints);
+    }
+
+    // حساب نقاط Chat Team
+    function calcChat() {
+        var xp = parseFloat(document.getElementById('c-xp').value) || 0;
+        var warns = parseFloat(document.getElementById('c-warns').value) || 0;
+        var events = parseFloat(document.getElementById('c-events').value) || 0;
+
+        var pointsFromXp = xp / 750;
+        var pointsFromWarns = warns / 3;
+        var pointsFromEvents = events * 10;
+
+        var totalPoints = pointsFromXp + pointsFromWarns + pointsFromEvents;
+        document.getElementById('chat-points').innerText = formatPoints(totalPoints);
+    }
+
+    // حساب نقاط Voice Team
+    function calcVoice() {
+        var xp = parseFloat(document.getElementById('v-xp').value) || 0;
+        var warns = parseFloat(document.getElementById('v-warns').value) || 0;
+        var events = parseFloat(document.getElementById('v-events').value) || 0;
+        var stage = parseFloat(document.getElementById('v-stage').value) || 0;
+
+        var pointsFromXp = xp / 1500;
+        var pointsFromWarns = warns / 3;
+        var pointsFromEvents = events * 10;
+        var pointsFromStage = stage * 15;
+
+        var totalPoints = pointsFromXp + pointsFromWarns + pointsFromEvents + pointsFromStage;
+        document.getElementById('voice-points').innerText = formatPoints(totalPoints);
+    }
+</script>
+
+</body>
+</html>
