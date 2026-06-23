@@ -1,19 +1,18 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حاسبة النقاط</title>
+    <title>Team Points Calculator</title>
     <style>
         :root {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --border-color: #333333;
-            --text-color: #e0e0e0;
-            --text-muted: #a0a0a0;
-            --accent-color: #ffffff;
-            --input-bg: #252525;
-            --active-tab: #2d2d2d;
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-input: #2d2d2d;
+            --text-main: #ffffff;
+            --text-sub: #b3b3b3;
+            --border-color: #3d3d3d;
+            --accent: #ffffff;
         }
 
         * {
@@ -24,298 +23,286 @@
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding: 20px;
+            background-color: var(--bg-main);
+            color: var(--text-main);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            padding: 20px;
         }
 
-        .container {
+        header {
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        /* شريط التنقل */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            background-color: var(--bg-card);
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
             width: 100%;
             max-width: 600px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-        }
-
-        /* نظام التبويب العلوي */
-        .tabs {
-            display: flex;
-            background-color: #1a1a1a;
-            border-bottom: 1px solid var(--border-color);
         }
 
         .tab-btn {
-            flex: 1;
-            padding: 15px 10px;
             background: none;
             border: none;
-            color: var(--text-muted);
-            font-size: 16px;
+            color: var(--text-sub);
+            padding: 12px 24px;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
+            border-radius: 8px;
             transition: all 0.3s ease;
-            text-align: center;
+            flex: 1;
         }
 
         .tab-btn:hover {
-            color: var(--accent-color);
-            background-color: rgba(255, 255, 255, 0.02);
+            color: var(--text-main);
+            background-color: var(--bg-input);
         }
 
         .tab-btn.active {
-            color: var(--accent-color);
-            background-color: var(--active-tab);
-            border-bottom: 2px solid var(--accent-color);
+            background-color: var(--accent);
+            color: var(--bg-main);
         }
 
-        /* محتوى التيمات */
-        .tab-content {
-            padding: 25px;
+        /* الحاويات والقوائم */
+        .content-container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .team-section {
             display: none;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
 
-        .tab-content.active {
+        .team-section.active {
             display: block;
         }
 
         h2 {
-            margin-bottom: 20px;
-            font-size: 22px;
-            color: var(--accent-color);
-            border-bottom: 1px solid var(--border-color);
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border-color);
             padding-bottom: 10px;
+            color: var(--text-main);
         }
 
         .input-group {
-            margin-bottom: 18px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: var(--text-muted);
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            font-weight: 500;
         }
 
-        input[type="number"] {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--input-bg);
+        input {
+            background-color: var(--bg-input);
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: var(--text-color);
-            font-size: 16px;
+            color: var(--text-main);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
             outline: none;
             transition: border-color 0.3s ease;
         }
 
-        input[type="number"]:focus {
-            border-color: var(--accent-color);
+        input:focus {
+            border-color: var(--accent);
         }
 
-        /* النتيجة والافضلية */
-        .result-box {
-            margin-top: 25px;
-            padding: 15px;
+        /* لوحة عرض النتيجة */
+        .result-panel {
+            margin-top: 30px;
             background-color: #1a1a1a;
-            border: 1px dashed var(--border-color);
-            border-radius: 6px;
-            text-align: center;
+            border-left: 4px solid var(--accent);
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .result-box span {
-            font-size: 14px;
-            color: var(--text-muted);
-            display: block;
-            margin-bottom: 5px;
+        .result-title {
+            font-size: 1.1rem;
+            color: var(--text-sub);
+            font-weight: 600;
         }
 
-        .result-box .points {
-            font-size: 32px;
-            font-weight: bold;
-            color: var(--accent-color);
-        }
-
-        .note {
-            font-size: 12px;
-            color: #777;
-            margin-top: 5px;
+        .points-display {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-main);
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- ازرار التنقل السريع -->
-    <div class="tabs">
-        <button class="tab-btn active" onclick="openTeam(event, 'ticket-team')">Ticket Team</button>
-        <button class="tab-btn" onclick="openTeam(event, 'chat-team')">Chat Team</button>
-        <button class="tab-btn" onclick="openTeam(event, 'voice-team')">Voice Team</button>
+    <header>
+        <h1>Team System Dashboard</h1>
+    </header>
+
+    <!-- أزرار التنقل السريع -->
+    <nav class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('ticket')">Ticket Team</button>
+        <button class="tab-btn" onclick="switchTab('chat')">Chat Team</button>
+        <button class="tab-btn" onclick="switchTab('voice')">Voice Team</button>
+    </nav>
+
+    <div class="content-container">
+        
+        <!-- Ticket Team Section -->
+        <section id="ticket" class="team-section active">
+            <h2>Ticket Team System</h2>
+            <div class="input-group">
+                <label for="tk-tickets">Tickets (Every 4 = 1 Pt)</label>
+                <input type="number" id="tk-tickets" min="0" value="0" oninput="calculateTicketPoints()">
+            </div>
+            <div class="input-group">
+                <label for="tk-scam">Scam Tickets (Every 2 = 1 Pt)</label>
+                <input type="number" id="tk-scam" min="0" value="0" oninput="calculateTicketPoints()">
+            </div>
+            <div class="input-group">
+                <label for="tk-xp">XP (Every 1500 = 1 Pt)</label>
+                <input type="number" id="tk-xp" min="0" value="0" oninput="calculateTicketPoints()">
+            </div>
+            <div class="input-group">
+                <label for="tk-bans">Bans (Every 5 = 1 Pt)</label>
+                <input type="number" id="tk-bans" min="0" value="0" oninput="calculateTicketPoints()">
+            </div>
+            
+            <div class="result-panel">
+                <span class="result-title">Total Points:</span>
+                <span id="ticket-total" class="points-display">0.00</span>
+            </div>
+        </section>
+
+        <!-- Chat Team Section -->
+        <section id="chat" class="team-section">
+            <h2>Chat Team System</h2>
+            <div class="input-group">
+                <label for="ch-xp">XP (Every 750 = 1 Pt)</label>
+                <input type="number" id="ch-xp" min="0" value="0" oninput="calculateChatPoints()">
+            </div>
+            <div class="input-group">
+                <label for="ch-warns">Warns (Every 3 = 1 Pt)</label>
+                <input type="number" id="ch-warns" min="0" value="0" oninput="calculateChatPoints()">
+            </div>
+            <div class="input-group">
+                <label for="ch-events">Events (Every 1 = 10 Pts)</label>
+                <input type="number" id="ch-events" min="0" value="0" oninput="calculateChatPoints()">
+            </div>
+
+            <div class="result-panel">
+                <span class="result-title">Total Points:</span>
+                <span id="chat-total" class="points-display">0.00</span>
+            </div>
+        </section>
+
+        <!-- Voice Team Section -->
+        <section id="voice" class="team-section">
+            <h2>Voice Team System</h2>
+            <div class="input-group">
+                <label for="vc-xp">Voice XP (Every 1500 = 1 Pt)</label>
+                <input type="number" id="vc-xp" min="0" value="0" oninput="calculateVoicePoints()">
+            </div>
+            <div class="input-group">
+                <label for="vc-warns">Voice Warns (Every 3 = 1 Pt)</label>
+                <input type="number" id="vc-warns" min="0" value="0" oninput="calculateVoicePoints()">
+            </div>
+            <div class="input-group">
+                <label for="vc-events">Events in Chat (Every 1 = 10 Pts)</label>
+                <input type="number" id="vc-events" min="0" value="0" oninput="calculateVoicePoints()">
+            </div>
+            <div class="input-group">
+                <label for="vc-stage">Stages (Every 1 = 15 Pts)</label>
+                <input type="number" id="vc-stage" min="0" value="0" oninput="calculateVoicePoints()">
+            </div>
+
+            <div class="result-panel">
+                <span class="result-title">Total Points:</span>
+                <span id="voice-total" class="points-display">0.00</span>
+            </div>
+        </section>
+
     </div>
 
-    <!-- Ticket Team -->
-    <div id="ticket-team" class="tab-content active">
-        <h2>نظام تيم التيكت</h2>
-        <div class="input-group">
-            <label>عدد التيكت الاجمالي (Tickets)</label>
-            <input type="number" id="t-tickets" value="0" min="0" oninput="calcTicket()">
-        </div>
-        <div class="input-group">
-            <label>عدد تيكت السكام (Scam Tickets)</label>
-            <input type="number" id="t-scam" value="0" min="0" oninput="calcTicket()">
-        </div>
-        <div class="input-group">
-            <label>الخبرة (XP)</label>
-            <input type="number" id="t-xp" value="0" min="0" oninput="calcTicket()">
-        </div>
-        <div class="input-group">
-            <label>عدد البندات (Bans)</label>
-            <input type="number" id="t-bans" value="0" min="0" oninput="calcTicket()">
-        </div>
-        <div class="result-box">
-            <span>مجموع النقاط الحالي</span>
-            <div class="points" id="ticket-points">0</div>
-            <div class="note">يتم خصم تيكت السكام تلقائيا من التيكت العادي قبل الحساب</div>
-        </div>
-    </div>
+    <script>
+        // دالة التنقل الفوري بين القوائم بدون إعادة تحميل الصفحة
+        function switchTab(teamId) {
+            // إخفاء جميع الأقسام
+            document.querySelectorAll('.team-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            // إزالة الحالة النشطة من الأزرار
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
 
-    <!-- Chat Team -->
-    <div id="chat-team" class="tab-content">
-        <h2>نظام تيم الشات</h2>
-        <div class="input-group">
-            <label>الخبرة (XP)</label>
-            <input type="number" id="c-xp" value="0" min="0" oninput="calcChat()">
-        </div>
-        <div class="input-group">
-            <label>عدد التحذيرات (Warns)</label>
-            <input type="number" id="c-warns" value="0" min="0" oninput="calcChat()">
-        </div>
-        <div class="input-group">
-            <label>عدد الايفنتات (Events - الحد الاقصى 1)</label>
-            <input type="number" id="c-events" value="0" min="0" max="1" oninput="calcChat()">
-        </div>
-        <div class="result-box">
-            <span>مجموع النقاط الحالي</span>
-            <div class="points" id="chat-points">0</div>
-        </div>
-    </div>
-
-    <!-- Voice Team -->
-    <div id="voice-team" class="tab-content">
-        <h2>نظام تيم الفويس</h2>
-        <div class="input-group">
-            <label>خبرة الفويس (Voice XP)</label>
-            <input type="number" id="v-xp" value="0" min="0" oninput="calcVoice()">
-        </div>
-        <div class="input-group">
-            <label>تحذيرات الفويس (Voice Warns)</label>
-            <input type="number" id="v-warns" value="0" min="0" oninput="calcVoice()">
-        </div>
-        <div class="input-group">
-            <label>ايفنت في الشات (Chat Event - الحد الاقصى 1)</label>
-            <input type="number" id="v-events" value="0" min="0" max="1" oninput="calcVoice()">
-        </div>
-        <div class="input-group">
-            <label>ايفنت الستيج (Stage Event - الحد الاقصى 1)</label>
-            <input type="number" id="v-stage" value="0" min="0" max="1" oninput="calcVoice()">
-        </div>
-        <div class="result-box">
-            <span>مجموع النقاط الحالي</span>
-            <div class="points" id="voice-points">0</div>
-        </div>
-    </div>
-</div>
-
-<script>
-    // وظيفة التنقل بين التبويبات بدون اعادة تحميل الصفحة
-    function openTeam(evt, teamId) {
-        var i, tabcontent, tablinks;
-        tabcontent = document.getElementsByClassName("tab-content");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-            tabcontent[i].classList.remove("active");
-        }
-        tablinks = document.getElementsByClassName("tab-btn");
-        for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].classList.remove("active");
-        }
-        document.getElementById(teamId).style.display = "block";
-        document.getElementById(teamId).classList.add("active");
-        evt.currentTarget.classList.add("active");
-    }
-
-    // حساب نقاط Ticket Team
-    function calcTicket() {
-        let totalTickets = parseInt(document.getElementById('t-tickets').value) || 0;
-        let scamTickets = parseInt(document.getElementById('t-scam').value) || 0;
-        let xp = parseInt(document.getElementById('t-xp').value) || 0;
-        let bans = parseInt(document.getElementById('t-bans').value) || 0;
-
-        // خصم السكام من التيكت العادي
-        let regularTickets = totalTickets - scamTickets;
-        if (regularTickets < 0) regularTickets = 0;
-
-        let pointsFromTickets = Math.floor(regularTickets / 4);
-        let pointsFromScam = Math.floor(scamTickets / 2);
-        let pointsFromXp = Math.floor(xp / 1500);
-        let pointsFromBans = Math.floor(bans / 5);
-
-        let totalPoints = pointsFromTickets + pointsFromScam + pointsFromXp + pointsFromBans;
-        document.getElementById('ticket-points').innerText = totalPoints;
-    }
-
-    // حساب نقاط Chat Team
-    function calcChat() {
-        let xp = parseInt(document.getElementById('c-xp').value) || 0;
-        let warns = parseInt(document.getElementById('c-warns').value) || 0;
-        let events = parseInt(document.getElementById('c-events').value) || 0;
-
-        // قفل الحد الاقصى للايفنت عند 1
-        if (events > 1) {
-            events = 1;
-            document.getElementById('c-events').value = 1;
+            // إظهار القسم المطلوب وتفعيل زره
+            document.getElementById(teamId).classList.add('active');
+            event.currentTarget.classList.add('active');
         }
 
-        let pointsFromXp = Math.floor(xp / 750);
-        let pointsFromWarns = Math.floor(warns / 3);
-        let pointsFromEvents = events * 10;
+        // حساب نقاط تيم الـ Ticket
+        function calculateTicketPoints() {
+            const tickets = parseFloat(document.getElementById('tk-tickets').value) || 0;
+            const scam = parseFloat(document.getElementById('tk-scam').value) || 0;
+            const xp = parseFloat(document.getElementById('tk-xp').value) || 0;
+            const bans = parseFloat(document.getElementById('tk-bans').value) || 0;
 
-        let totalPoints = pointsFromXp + pointsFromWarns + pointsFromEvents;
-        document.getElementById('chat-points').innerText = totalPoints;
-    }
-
-    // حساب نقاط Voice Team
-    function calcVoice() {
-        let xp = parseInt(document.getElementById('v-xp').value) || 0;
-        let warns = parseInt(document.getElementById('v-warns').value) || 0;
-        let events = parseInt(document.getElementById('v-events').value) || 0;
-        let stage = parseInt(document.getElementById('v-stage').value) || 0;
-
-        // قفل الحد الاقصى عند 1
-        if (events > 1) {
-            events = 1;
-            document.getElementById('v-events').value = 1;
-        }
-        if (stage > 1) {
-            stage = 1;
-            document.getElementById('v-stage').value = 1;
+            const total = (tickets / 4) + (scam / 2) + (xp / 1500) + (bans / 5);
+            document.getElementById('ticket-total').innerText = total.toFixed(2);
         }
 
-        let pointsFromXp = Math.floor(xp / 1500);
-        let pointsFromWarns = Math.floor(warns / 3);
-        let pointsFromEvents = events * 10;
-        let pointsFromStage = stage * 15;
+        // حساب نقاط تيم الـ Chat
+        function calculateChatPoints() {
+            const xp = parseFloat(document.getElementById('ch-xp').value) || 0;
+            const warns = parseFloat(document.getElementById('ch-warns').value) || 0;
+            const events = parseFloat(document.getElementById('ch-events').value) || 0;
 
-        let totalPoints = pointsFromXp + pointsFromWarns + pointsFromEvents + pointsFromStage;
-        document.getElementById('voice-points').innerText = totalPoints;
-    }
-</script>
+            const total = (xp / 750) + (warns / 3) + (events * 10);
+            document.getElementById('chat-total').innerText = total.toFixed(2);
+        }
 
+        // حساب نقاط تيم الـ Voice
+        function calculateVoicePoints() {
+            const xp = parseFloat(document.getElementById('vc-xp').value) || 0;
+            const warns = parseFloat(document.getElementById('vc-warns').value) || 0;
+            const events = parseFloat(document.getElementById('vc-events').value) || 0;
+            const stage = parseFloat(document.getElementById('vc-stage').value) || 0;
+
+            const total = (xp / 1500) + (warns / 3) + (events * 10) + (stage * 15);
+            document.getElementById('voice-total').innerText = total.toFixed(2);
+        }
+    </script>
 </body>
 </html>
