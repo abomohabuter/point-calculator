@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة النقاط</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --border-color: #333333;
+            --text-color: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --accent-color: #ffffff;
+            --input-bg: #252525;
+            --active-tab: #2d2d2d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        /* نظام التبويب العلوي */
+        .tabs {
+            display: flex;
+            background-color: #1a1a1a;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px 10px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            color: var(--accent-color);
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .tab-btn.active {
+            color: var(--accent-color);
+            background-color: var(--active-tab);
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        /* محتوى التيمات */
+        .tab-content {
+            padding: 25px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 22px;
+            color: var(--accent-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-color);
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--accent-color);
+        }
+
+        /* النتيجة والافضلية */
+        .result-box {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #1a1a1a;
+            border: 1px dashed var(--border-color);
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .result-box span {
+            font-size: 14px;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .result-box .points {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .note {
+            font-size: 12px;
+            color: #777;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- ازرار التنقل السريع -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTeam(event, 'ticket-team')">Ticket Team</button>
+        <button class="tab-btn" onclick="openTeam(event, 'chat-team')">Chat Team</button>
+        <button class="tab-btn" onclick="openTeam(event, 'voice-team')">Voice Team</button>
+    </div>
+
+    <!-- Ticket Team -->
+    <div id="ticket-team" class="tab-content active">
+        <h2>نظام تيم التيكت</h2>
+        <div class="input-group">
+            <label>عدد التيكت الاجمالي (Tickets)</label>
+            <input type="number" id="t-tickets" value="0" min="0" oninput="calcTicket()">
+        </div>
+        <div class="input-group">
+            <label>عدد تيكت السكام (Scam Tickets)</label>
+            <input type="number" id="t-scam" value="0" min="0" oninput="calcTicket()">
+        </div>
+        <div class="input-group">
+            <label>الخبرة (XP)</label>
+            <input type="number" id="t-xp" value="0" min="0" oninput="calcTicket()">
+        </div>
+        <div class="input-group">
+            <label>عدد البندات (Bans)</label>
+            <input type="number" id="t-bans" value="0" min="0" oninput="calcTicket()">
+        </div>
+        <div class="result-box">
+            <span>مجموع النقاط الحالي</span>
+            <div class="points" id="ticket-points">0</div>
+            <div class="note">يتم خصم تيكت السكام تلقائيا من التيكت العادي قبل الحساب</div>
+        </div>
+    </div>
+
+    <!-- Chat Team -->
+    <div id="chat-team" class="tab-content">
+        <h2>نظام تيم الشات</h2>
+        <div class="input-group">
+            <label>الخبرة (XP)</label>
+            <input type="number" id="c-xp" value="0" min="0" oninput="calcChat()">
+        </div>
+        <div class="input-group">
+            <label>عدد التحذيرات (Warns)</label>
+            <input type="number" id="c-warns" value="0" min="0" oninput="calcChat()">
+        </div>
+        <div class="input-group">
+            <label>عدد الايفنتات (Events - الحد الاقصى 1)</label>
+            <input type="number" id="c-events" value="0" min="0" max="1" oninput="calcChat()">
+        </div>
+        <div class="result-box">
+            <span>مجموع النقاط الحالي</span>
+            <div class="points" id="chat-points">0</div>
+        </div>
+    </div>
+
+    <!-- Voice Team -->
+    <div id="voice-team" class="tab-content">
+        <h2>نظام تيم الفويس</h2>
+        <div class="input-group">
+            <label>خبرة الفويس (Voice XP)</label>
+            <input type="number" id="v-xp" value="0" min="0" oninput="calcVoice()">
+        </div>
+        <div class="input-group">
+            <label>تحذيرات الفويس (Voice Warns)</label>
+            <input type="number" id="v-warns" value="0" min="0" oninput="calcVoice()">
+        </div>
+        <div class="input-group">
+            <label>ايفنت في الشات (Chat Event - الحد الاقصى 1)</label>
+            <input type="number" id="v-events" value="0" min="0" max="1" oninput="calcVoice()">
+        </div>
+        <div class="input-group">
+            <label>ايفنت الستيج (Stage Event - الحد الاقصى 1)</label>
+            <input type="number" id="v-stage" value="0" min="0" max="1" oninput="calcVoice()">
+        </div>
+        <div class="result-box">
+            <span>مجموع النقاط الحالي</span>
+            <div class="points" id="voice-points">0</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // وظيفة التنقل بين التبويبات بدون اعادة تحميل الصفحة
+    function openTeam(evt, teamId) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+            tabcontent[i].classList.remove("active");
+        }
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+        document.getElementById(teamId).style.display = "block";
+        document.getElementById(teamId).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+
+    // حساب نقاط Ticket Team
+    function calcTicket() {
+        let totalTickets = parseInt(document.getElementById('t-tickets').value) || 0;
+        let scamTickets = parseInt(document.getElementById('t-scam').value) || 0;
+        let xp = parseInt(document.getElementById('t-xp').value) || 0;
+        let bans = parseInt(document.getElementById('t-bans').value) || 0;
+
+        // خصم السكام من التيكت العادي
+        let regularTickets = totalTickets - scamTickets;
+        if (regularTickets < 0) regularTickets = 0;
+
+        let pointsFromTickets = Math.floor(regularTickets / 4);
+        let pointsFromScam = Math.floor(scamTickets / 2);
+        let pointsFromXp = Math.floor(xp / 1500);
+        let pointsFromBans = Math.floor(bans / 5);
+
+        let totalPoints = pointsFromTickets + pointsFromScam + pointsFromXp + pointsFromBans;
+        document.getElementById('ticket-points').innerText = totalPoints;
+    }
+
+    // حساب نقاط Chat Team
+    function calcChat() {
+        let xp = parseInt(document.getElementById('c-xp').value) || 0;
+        let warns = parseInt(document.getElementById('c-warns').value) || 0;
+        let events = parseInt(document.getElementById('c-events').value) || 0;
+
+        // قفل الحد الاقصى للايفنت عند 1
+        if (events > 1) {
+            events = 1;
+            document.getElementById('c-events').value = 1;
+        }
+
+        let pointsFromXp = Math.floor(xp / 750);
+        let pointsFromWarns = Math.floor(warns / 3);
+        let pointsFromEvents = events * 10;
+
+        let totalPoints = pointsFromXp + pointsFromWarns + pointsFromEvents;
+        document.getElementById('chat-points').innerText = totalPoints;
+    }
+
+    // حساب نقاط Voice Team
+    function calcVoice() {
+        let xp = parseInt(document.getElementById('v-xp').value) || 0;
+        let warns = parseInt(document.getElementById('v-warns').value) || 0;
+        let events = parseInt(document.getElementById('v-events').value) || 0;
+        let stage = parseInt(document.getElementById('v-stage').value) || 0;
+
+        // قفل الحد الاقصى عند 1
+        if (events > 1) {
+            events = 1;
+            document.getElementById('v-events').value = 1;
+        }
+        if (stage > 1) {
+            stage = 1;
+            document.getElementById('v-stage').value = 1;
+        }
+
+        let pointsFromXp = Math.floor(xp / 1500);
+        let pointsFromWarns = Math.floor(warns / 3);
+        let pointsFromEvents = events * 10;
+        let pointsFromStage = stage * 15;
+
+        let totalPoints = pointsFromXp + pointsFromWarns + pointsFromEvents + pointsFromStage;
+        document.getElementById('voice-points').innerText = totalPoints;
+    }
+</script>
+
+</body>
+</html>
