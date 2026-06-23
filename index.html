@@ -119,7 +119,7 @@
             border-color: var(--accent-color);
         }
 
-        /* النتيجة */
+        /* النتيجة والافضلية */
         .result-box {
             margin-top: 25px;
             padding: 15px;
@@ -152,12 +152,14 @@
 <body>
 
 <div class="container">
+    <!-- ازرار التنقل السريع -->
     <div class="tabs">
         <button class="tab-btn active" onclick="openTeam(event, 'ticket-team')">Ticket Team</button>
         <button class="tab-btn" onclick="openTeam(event, 'chat-team')">Chat Team</button>
         <button class="tab-btn" onclick="openTeam(event, 'voice-team')">Voice Team</button>
     </div>
 
+    <!-- Ticket Team -->
     <div id="ticket-team" class="tab-content active">
         <h2>نظام تيم التيكت</h2>
         <div class="input-group">
@@ -183,6 +185,7 @@
         </div>
     </div>
 
+    <!-- Chat Team -->
     <div id="chat-team" class="tab-content">
         <h2>نظام تيم الشات</h2>
         <div class="input-group">
@@ -194,8 +197,8 @@
             <input type="number" id="c-warns" value="0" min="0" oninput="calcChat()">
         </div>
         <div class="input-group">
-            <label>عدد الايفنتات (Events)</label>
-            <input type="number" id="c-events" value="0" min="0" oninput="calcChat()">
+            <label>عدد الايفنتات (Events - الحد الاقصى 1)</label>
+            <input type="number" id="c-events" value="0" min="0" max="1" oninput="calcChat()">
         </div>
         <div class="result-box">
             <span>مجموع النقاط الحالي</span>
@@ -203,6 +206,7 @@
         </div>
     </div>
 
+    <!-- Voice Team -->
     <div id="voice-team" class="tab-content">
         <h2>نظام تيم الفويس</h2>
         <div class="input-group">
@@ -214,12 +218,12 @@
             <input type="number" id="v-warns" value="0" min="0" oninput="calcVoice()">
         </div>
         <div class="input-group">
-            <label>ايفنت في الشات (Chat Event)</label>
-            <input type="number" id="v-events" value="0" min="0" oninput="calcVoice()">
+            <label>ايفنت في الشات (Chat Event - الحد الاقصى 1)</label>
+            <input type="number" id="v-events" value="0" min="0" max="1" oninput="calcVoice()">
         </div>
         <div class="input-group">
-            <label>ايفنت الستيج (Stage Event)</label>
-            <input type="number" id="v-stage" value="0" min="0" oninput="calcVoice()">
+            <label>ايفنت الستيج (Stage Event - الحد الاقصى 1)</label>
+            <input type="number" id="v-stage" value="0" min="0" max="1" oninput="calcVoice()">
         </div>
         <div class="result-box">
             <span>مجموع النقاط الحالي</span>
@@ -229,7 +233,7 @@
 </div>
 
 <script>
-    // وظيفة التنقل بين التبويبات
+    // وظيفة التنقل بين التبويبات بدون اعادة تحميل الصفحة
     function openTeam(evt, teamId) {
         var i, tabcontent, tablinks;
         tabcontent = document.getElementsByClassName("tab-content");
@@ -246,58 +250,70 @@
         evt.currentTarget.classList.add("active");
     }
 
-    // تنسيق الأرقام لظهور رقمين بعد الفاصلة وحذف الأصفار الزائدة
-    function formatPoints(num) {
-        return Number(num.toFixed(2)).toString();
-    }
-
     // حساب نقاط Ticket Team
     function calcTicket() {
-        var totalTickets = parseFloat(document.getElementById('t-tickets').value) || 0;
-        var scamTickets = parseFloat(document.getElementById('t-scam').value) || 0;
-        var xp = parseFloat(document.getElementById('t-xp').value) || 0;
-        var bans = parseFloat(document.getElementById('t-bans').value) || 0;
+        let totalTickets = parseInt(document.getElementById('t-tickets').value) || 0;
+        let scamTickets = parseInt(document.getElementById('t-scam').value) || 0;
+        let xp = parseInt(document.getElementById('t-xp').value) || 0;
+        let bans = parseInt(document.getElementById('t-bans').value) || 0;
 
-        var regularTickets = totalTickets - scamTickets;
+        // خصم السكام من التيكت العادي
+        let regularTickets = totalTickets - scamTickets;
         if (regularTickets < 0) regularTickets = 0;
 
-        var pointsFromTickets = regularTickets / 4;
-        var pointsFromScam = scamTickets / 2;
-        var pointsFromXp = xp / 1500;
-        var pointsFromBans = bans / 5;
+        let pointsFromTickets = Math.floor(regularTickets / 4);
+        let pointsFromScam = Math.floor(scamTickets / 2);
+        let pointsFromXp = Math.floor(xp / 1500);
+        let pointsFromBans = Math.floor(bans / 5);
 
-        var totalPoints = pointsFromTickets + pointsFromScam + pointsFromXp + pointsFromBans;
-        document.getElementById('ticket-points').innerText = formatPoints(totalPoints);
+        let totalPoints = pointsFromTickets + pointsFromScam + pointsFromXp + pointsFromBans;
+        document.getElementById('ticket-points').innerText = totalPoints;
     }
 
     // حساب نقاط Chat Team
     function calcChat() {
-        var xp = parseFloat(document.getElementById('c-xp').value) || 0;
-        var warns = parseFloat(document.getElementById('c-warns').value) || 0;
-        var events = parseFloat(document.getElementById('c-events').value) || 0;
+        let xp = parseInt(document.getElementById('c-xp').value) || 0;
+        let warns = parseInt(document.getElementById('c-warns').value) || 0;
+        let events = parseInt(document.getElementById('c-events').value) || 0;
 
-        var pointsFromXp = xp / 750;
-        var pointsFromWarns = warns / 3;
-        var pointsFromEvents = events * 10;
+        // قفل الحد الاقصى للايفنت عند 1
+        if (events > 1) {
+            events = 1;
+            document.getElementById('c-events').value = 1;
+        }
 
-        var totalPoints = pointsFromXp + pointsFromWarns + pointsFromEvents;
-        document.getElementById('chat-points').innerText = formatPoints(totalPoints);
+        let pointsFromXp = Math.floor(xp / 750);
+        let pointsFromWarns = Math.floor(warns / 3);
+        let pointsFromEvents = events * 10;
+
+        let totalPoints = pointsFromXp + pointsFromWarns + pointsFromEvents;
+        document.getElementById('chat-points').innerText = totalPoints;
     }
 
     // حساب نقاط Voice Team
     function calcVoice() {
-        var xp = parseFloat(document.getElementById('v-xp').value) || 0;
-        var warns = parseFloat(document.getElementById('v-warns').value) || 0;
-        var events = parseFloat(document.getElementById('v-events').value) || 0;
-        var stage = parseFloat(document.getElementById('v-stage').value) || 0;
+        let xp = parseInt(document.getElementById('v-xp').value) || 0;
+        let warns = parseInt(document.getElementById('v-warns').value) || 0;
+        let events = parseInt(document.getElementById('v-events').value) || 0;
+        let stage = parseInt(document.getElementById('v-stage').value) || 0;
 
-        var pointsFromXp = xp / 1500;
-        var pointsFromWarns = warns / 3;
-        var pointsFromEvents = events * 10;
-        var pointsFromStage = stage * 15;
+        // قفل الحد الاقصى عند 1
+        if (events > 1) {
+            events = 1;
+            document.getElementById('v-events').value = 1;
+        }
+        if (stage > 1) {
+            stage = 1;
+            document.getElementById('v-stage').value = 1;
+        }
 
-        var totalPoints = pointsFromXp + pointsFromWarns + pointsFromEvents + pointsFromStage;
-        document.getElementById('voice-points').innerText = formatPoints(totalPoints);
+        let pointsFromXp = Math.floor(xp / 1500);
+        let pointsFromWarns = Math.floor(warns / 3);
+        let pointsFromEvents = events * 10;
+        let pointsFromStage = stage * 15;
+
+        let totalPoints = pointsFromXp + pointsFromWarns + pointsFromEvents + pointsFromStage;
+        document.getElementById('voice-points').innerText = totalPoints;
     }
 </script>
 
